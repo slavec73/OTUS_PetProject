@@ -1,0 +1,33 @@
+## ===== .NET =====
+bin/
+obj/
+out/
+publish/
+
+## ===== Visual Studio =====
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## ===== Rider / JetBrains =====
+.idea/
+*.DotSettings.user
+
+## ===== Logs =====
+*.log
+
+## ===== Publish output =====
+publish/
+
+## ===== Secrets / configs =====
+appsettings.Development.json
+secrets.json
+
+## ===== OS =====
+.DS_Store
+Thumbs.db
+
+## ===== NuGet =====
+*.nupkg
