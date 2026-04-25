@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using VacationPlanner.Implementation;
+using VacationPlanner.Implementation.Services;
 using VacationPlanner.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,3 +43,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+//Добавление сервисов AdministrationController
+
+//builder.Services.AddScoped<IPositionRepository, PositionRepository>();
+//builder.Services.AddScoped<IVacationDurationRepository, VacationDurationRepository>();
+builder.Services.AddScoped<IPositionService, PositionService>();
+//builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IVacationDurationService, VacationDurationService>();

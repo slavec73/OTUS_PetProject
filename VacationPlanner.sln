@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VacationPlanner.Interfaces"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VacationPlanner.Implementation", "src\VacationPlanner.Implementation\VacationPlanner.Implementation\VacationPlanner.Implementation.csproj", "{A8945A4B-8D49-42CE-829D-EEEE02ECD7A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VacationPlanner.Models", "VacationPlanner.Models\VacationPlanner.Models.csproj", "{D5B478D7-DCED-4B1C-A328-B8DE3B5135B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{A8945A4B-8D49-42CE-829D-EEEE02ECD7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8945A4B-8D49-42CE-829D-EEEE02ECD7A6}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{A8945A4B-8D49-42CE-829D-EEEE02ECD7A6}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{D5B478D7-DCED-4B1C-A328-B8DE3B5135B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5B478D7-DCED-4B1C-A328-B8DE3B5135B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5B478D7-DCED-4B1C-A328-B8DE3B5135B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5B478D7-DCED-4B1C-A328-B8DE3B5135B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
