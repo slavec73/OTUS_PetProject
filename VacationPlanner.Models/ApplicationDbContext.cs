@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using VacationPlanner.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace VacationPlanner.Data
+namespace VacationPlanner.Models
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : DbContext
     {
         public DbSet<Position> Positions { get; set; }
         public DbSet<GlobalVacationSetting> GlobalVacationSettings { get; set; }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VacationPlanner.Interfaces;
 using VacationPlanner.Models;
-using VacationPlanner.Data;
 
 public class EfVacationDurationRepository : IVacationDurationRepository
 {
