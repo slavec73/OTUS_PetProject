@@ -11,7 +11,7 @@ using VacationPlanner.Models;
 namespace VacationPlanner.Models.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260518103416_CreateAdminTables")]
+    [Migration("20260611174128_CreateAdminTables")]
     partial class CreateAdminTables
     {
         /// <inheritdoc />
