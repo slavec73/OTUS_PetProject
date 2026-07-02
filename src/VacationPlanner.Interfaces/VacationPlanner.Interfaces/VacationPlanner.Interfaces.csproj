@@ -10,4 +10,8 @@
     <PackageReference Include="StackExchange.Redis" Version="2.12.14" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\VacationPlanner.Models\VacationPlanner.Models.csproj" />
+  </ItemGroup>
+
 </Project>
