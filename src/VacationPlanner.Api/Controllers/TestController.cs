@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using VacationPlanner.Interfaces;
+using VacationPlanner.Interfaces.Helpers;
+using VacationPlanner.Interfaces.Infrastructure;
 
 namespace VacationPlanner.Controllers
 {
