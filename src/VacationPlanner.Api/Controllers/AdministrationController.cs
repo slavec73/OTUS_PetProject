@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VacationPlanner.Interfaces;
+using VacationPlanner.Interfaces.Services;
+using VacationPlanner.Models.DbModels;
 
 namespace VacationPlanner.Api.Controllers
 {
     [ApiController]
     [Route("api/admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = WellKnownRoles.Administrator)]
     public class AdministrationController : ControllerBase
     {
         private readonly IPositionService _positionService;
@@ -36,6 +37,7 @@ namespace VacationPlanner.Api.Controllers
             var position = await _positionService.GetPositionByIdAsync(id);
             if (position == null)
                 return NotFound();
+
             return Ok(position);
         }
 
@@ -93,7 +95,7 @@ namespace VacationPlanner.Api.Controllers
         }
 
         [HttpGet("users/{userId}")]
-        public async Task<IActionResult> GetUserById(string userId)
+        public async Task<IActionResult> GetUserById(Guid userId)
         {
             var user = await _userRoleService.GetUserByIdAsync(userId);
             if (user == null)
@@ -102,7 +104,7 @@ namespace VacationPlanner.Api.Controllers
         }
 
         [HttpPost("users/{userId}/role")]
-        public async Task<IActionResult> ChangeUserRole(string userId, [FromBody] string newRole)
+        public async Task<IActionResult> ChangeUserRole(Guid userId, [FromBody] Guid newRole)
         {
             var success = await _userRoleService.ChangeUserRoleAsync(userId, newRole);
             if (!success)
