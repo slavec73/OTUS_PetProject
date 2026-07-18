@@ -2,7 +2,7 @@
 
 namespace VacationPlanner.Interfaces.Helpers
 {
-    public interface IEmailService
+    public interface INotificationService
     {
         Task SendAsync(NotificationMessage message);
     }

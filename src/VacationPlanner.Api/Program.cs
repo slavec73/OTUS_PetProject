@@ -6,6 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System.Text;
+using VacationPlanner.Common.Events;
+using VacationPlanner.Core.Events;
+using VacationPlanner.Implementation.EventHandlers.Notifications;
+using VacationPlanner.Implementation.Events;
 using VacationPlanner.Implementation.Helpers;
 using VacationPlanner.Implementation.Infrastructure;
 using VacationPlanner.Implementation.Repository;
@@ -52,6 +56,7 @@ var conf = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IDbHealthService, PostgresDbHealthService>();
 builder.Services.Configure<RedisOptions>(
@@ -84,6 +89,18 @@ builder.Services.Configure<JwtOptions>(
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
+builder.Services.AddScoped<IEventHandler<VacationRequestCreatedEvent>, VacationRequestCreatedNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<VacationRequestSubmittedEvent>, VacationRequestSubmittedNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<VacationRequestApprovedByManagerEvent>, VacationRequestApprovedByManagerNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<VacationRequestRejectedByManagerEvent>, VacationRequestRejectedByManagerNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<VacationRequestApprovedByHrEvent>, VacationRequestApprovedByHrNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<VacationRequestRejectedByHrEvent>, VacationRequestRejectedByHrNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<VacationCreatedEvent>, VacationCreatedNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<UserRegisteredEvent>, UserRegisteredNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<PasswordChangedEvent>, PasswordChangedNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<PasswordRestoreRequestedEvent>, PasswordRestoreRequestedNotificationHandler>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

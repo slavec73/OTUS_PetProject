@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using VacationPlanner.Core.Events;
 using VacationPlanner.Interfaces.Helpers;
 using VacationPlanner.Interfaces.Infrastructure;
 using VacationPlanner.Interfaces.Repository;
@@ -11,23 +12,23 @@ namespace VacationPlanner.Implementation.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IEmailService _emailService;
         private readonly IJwtService _jwtService;
         private readonly ICacheService _cacheService;
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IEventDispatcher _eventDispatcher;
 
         public AuthService(
-            IEmailService emailService,
             IJwtService jwtService,
             ICacheService cacheService,
             IUserRepository userRepository,
-            IRoleRepository roleRepository)
+            IRoleRepository roleRepository,
+            IEventDispatcher eventDispatcher)
         {
-            _emailService = emailService;
             _jwtService = jwtService;
             _cacheService = cacheService;
             _userRepository = userRepository;
+            _eventDispatcher = eventDispatcher;
             _roleRepository = roleRepository;
         }
 
@@ -36,7 +37,7 @@ namespace VacationPlanner.Implementation.Services
         {
             var email = request.Email.Trim().ToLower();
 
-            var user = _userRepository.FindUserByEmailAsync(email);
+            var user = await _userRepository.FindUserByEmailAsync(email);
 
             if (user is not null)
             {
@@ -77,10 +78,11 @@ namespace VacationPlanner.Implementation.Services
 
             await _userRepository.AddUserAsync(createdUser);
 
-            await _emailService.SendAsync(
-            createdUser.Email,
-            "Регистрация в VacationPlanner",
-            $"Здравствуйте, {createdUser.FirstName}! Вы успешно зарегистрированы.");
+            await _eventDispatcher.PublishAsync(
+                new UserRegisteredEvent(
+                    createdUser.UserId,
+                    createdUser.Email,
+                    createdUser.FirstName));
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -224,10 +226,11 @@ namespace VacationPlanner.Implementation.Services
             await _userRepository.ChangeUserPasswordAsync(userId, BCrypt.Net.BCrypt.HashPassword(
                 request.NewPassword));
 
-            await _emailService.SendAsync(
-            user.Email,
-            "Изменение пароля",
-            $"Здравствуйте, {user.FirstName}! Ваш пароль был успешно изменен.");
+            await _eventDispatcher.PublishAsync(
+                new PasswordChangedEvent(
+                    user.UserId,
+                    user.Email,
+                    user.FirstName));
         }
 
         public async Task ForgotPasswordAsync(
@@ -263,11 +266,11 @@ namespace VacationPlanner.Implementation.Services
                 JsonSerializer.Serialize(resetData),
                 TimeSpan.FromMinutes(15));
 
-
-            await _emailService.SendAsync(
-                user.Email,
-                "Восстановление пароля",
-                $"Ваш код восстановления пароля: {code}");
+            await _eventDispatcher.PublishAsync(
+                new PasswordRestoreRequestedEvent(
+                    user.UserId,
+                    user.Email,
+                    code));
         }
 
         public async Task ResetPasswordAsync(
@@ -316,10 +319,11 @@ namespace VacationPlanner.Implementation.Services
             await _cacheService.RemoveAsync(
                 $"password_reset:{email}");
 
-            await _emailService.SendAsync(
-                user.Email,
-                "Изменение пароля",
-                $"Здравствуйте, {user.FirstName}! Ваш пароль успешно изменен!");
+            await _eventDispatcher.PublishAsync(
+                new PasswordChangedEvent(
+                    user.UserId,
+                    user.Email,
+                    user.FirstName));
         }
     }
 }
