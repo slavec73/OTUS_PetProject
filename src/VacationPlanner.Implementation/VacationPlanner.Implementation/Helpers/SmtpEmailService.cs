@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Net.Mail;
+using VacationPlanner.Core.Notifications;
 using VacationPlanner.Interfaces.Helpers;
 
 namespace VacationPlanner.Implementation.Helpers
@@ -13,7 +14,7 @@ namespace VacationPlanner.Implementation.Helpers
             _config = config;
         }
 
-        public async Task SendAsync(string to, string subject, string body)
+        public async Task SendAsync(NotificationMessage notifficationMessage)
         {
             var smtp = _config.GetSection("Smtp");
 
@@ -23,14 +24,17 @@ namespace VacationPlanner.Implementation.Helpers
                 UseDefaultCredentials = false
             };
 
-            var message = new MailMessage(
-                smtp["From"],
-                to,
-                subject,
-                body
-            );
+            foreach (var recipient in notifficationMessage.RecipientMails)
+            {
+                var message = new MailMessage(
+                    smtp["From"],
+                    recipient,
+                    notifficationMessage.Subject,
+                    notifficationMessage.Body
+                );
 
-            await client.SendMailAsync(message);
+                await client.SendMailAsync(message);
+            }
         }
     }
 }

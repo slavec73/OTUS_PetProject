@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\VacationPlanner.Common\VacationPlanner.Core.csproj" />
     <ProjectReference Include="..\..\..\VacationPlanner.Models\VacationPlanner.Models.csproj" />
   </ItemGroup>
 
