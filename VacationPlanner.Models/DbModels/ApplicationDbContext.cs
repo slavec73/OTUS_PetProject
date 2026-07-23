@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace VacationPlanner.Models.DbModels
 {
@@ -9,6 +10,11 @@ namespace VacationPlanner.Models.DbModels
         public DbSet<PositionVacationSetting> PositionVacationSettings { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+
+        //Заявка
+        public DbSet<VacationRequest> VacationRequests => Set<VacationRequest>();
+        public DbSet<VacationApproval> VacationApprovals => Set<VacationApproval>();
+        public DbSet<Vacation> Vacations => Set<Vacation>();
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -70,6 +76,45 @@ namespace VacationPlanner.Models.DbModels
                     RoleId = WellKnownRoles.AdministratorId
                 }
             );
+
+            builder.Entity<VacationRequest>(entity =>
+         {
+             entity.HasKey(e => e.VacationRequestId);
+             entity.HasOne(e => e.User)
+                   .WithMany()
+                   .HasForeignKey(e => e.UserId)
+                   .OnDelete(DeleteBehavior.Restrict);
+             entity.Property(e => e.Reason).HasMaxLength(500);
+             entity.Property(e => e.Comment).HasMaxLength(500);
+         });
+
+            builder.Entity<VacationApproval>(entity =>
+                    {
+                        entity.HasKey(e => e.VacationApprovalId);
+                        entity.HasOne(e => e.VacationRequest)
+                              .WithMany(vr => vr.Approvals)
+                              .HasForeignKey(e => e.VacationRequestId)
+                              .OnDelete(DeleteBehavior.Cascade);
+                        entity.HasOne(e => e.ApproverUser)
+                              .WithMany()
+                              .HasForeignKey(e => e.ApproverUserId)
+                              .OnDelete(DeleteBehavior.Restrict);
+                        entity.Property(e => e.Comment).HasMaxLength(500);
+                    });
+
+            builder.Entity<Vacation>(entity =>
+                    {
+                        entity.HasKey(e => e.VacationId);
+                        entity.HasOne(e => e.User)
+                              .WithMany()
+                              .HasForeignKey(e => e.UserId)
+                              .OnDelete(DeleteBehavior.Restrict);
+                        entity.HasOne(e => e.VacationRequest)
+                              .WithMany()
+                              .HasForeignKey(e => e.VacationRequestId)
+                              .OnDelete(DeleteBehavior.SetNull);
+                        entity.Property(e => e.VacationType).HasMaxLength(200);
+                    });
         }
     }
 }

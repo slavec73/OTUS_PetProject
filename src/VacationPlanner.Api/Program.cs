@@ -22,6 +22,10 @@ using VacationPlanner.Models.DbModels;
 using VacationPlanner.Models.Options;
 using VacationPlanner.Models.Requests;
 using VacationPlanner.Validators;
+using VacationPlanner.Models.Enums;
+using VacationPlanner.Models.Requests;
+using VacationPlanner.Implementation.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +104,20 @@ builder.Services.AddScoped<IEventHandler<VacationCreatedEvent>, VacationCreatedN
 builder.Services.AddScoped<IEventHandler<UserRegisteredEvent>, UserRegisteredNotificationHandler>();
 builder.Services.AddScoped<IEventHandler<PasswordChangedEvent>, PasswordChangedNotificationHandler>();
 builder.Services.AddScoped<IEventHandler<PasswordRestoreRequestedEvent>, PasswordRestoreRequestedNotificationHandler>();
+
+
+//---РЕГИСТРАЦИЯ РЕПОЗИТОРИЕВ(добавить к существующим Scoped - регистрациям)-- -
+builder.Services.AddScoped<IVacationRequestRepository, EfVacationRequestRepository>();
+builder.Services.AddScoped<IVacationRepository, EfVacationRepository>();
+builder.Services.AddScoped<IVacationApprovalRepository, EfVacationApprovalRepository>();
+
+//---РЕГИСТРАЦИЯ СЕРВИСОВ(добавить к существующим Scoped - регистрациям)-- -
+builder.Services.AddScoped<IVacationRequestService, VacationRequestService>();
+builder.Services.AddScoped<IVacationService, VacationService>();
+
+//---РЕГИСТРАЦИЯ ВАЛИДАТОРОВ(добавить к существующим)-- -
+builder.Services.AddScoped<IValidator<CreateVacationRequest>, CreateVacationRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateVacationRequest>, UpdateVacationRequestValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
