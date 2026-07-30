@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VacationPlanner.Models.DbModels;
@@ -11,9 +12,11 @@ using VacationPlanner.Models.DbModels;
 namespace VacationPlanner.Models.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260723144537_AddVacationTables")]
+    partial class AddVacationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,9 +158,6 @@ namespace VacationPlanner.Models.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("PositionId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -168,8 +168,6 @@ namespace VacationPlanner.Models.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
-
-                    b.HasIndex("PositionId");
 
                     b.HasIndex("RoleId");
 
@@ -183,7 +181,7 @@ namespace VacationPlanner.Models.Migrations
                             FirstName = "System",
                             IsActive = true,
                             LastName = "Administrator",
-                            PasswordHash = "$2a$11$lvVJUGOZBJ7qt8LWxHzPw.UX5v3wWvi/Hu5wY42j/Ixq2SlxrMk5m",
+                            PasswordHash = "$2a$11$5hn/ktcVci5PE7Vhr2A36uu6JvYDys.3xRYuz89xxvkgjnuaIDJCq",
                             RegistrationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RoleId = new Guid("11111111-1111-1111-1111-111111111111")
                         });
@@ -314,18 +312,11 @@ namespace VacationPlanner.Models.Migrations
 
             modelBuilder.Entity("VacationPlanner.Models.DbModels.User", b =>
                 {
-                    b.HasOne("VacationPlanner.Models.DbModels.Position", "Position")
-                        .WithMany()
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("VacationPlanner.Models.DbModels.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Position");
 
                     b.Navigation("Role");
                 });

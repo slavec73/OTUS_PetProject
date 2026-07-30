@@ -1,4 +1,6 @@
-﻿namespace VacationPlanner.Models.DbModels
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace VacationPlanner.Models.DbModels
 {
     public class User
     {
@@ -19,5 +21,10 @@
         public Guid RoleId { get; set; }
 
         public Role Role { get; set; } = null!;
+
+        public int? PositionId { get; set; }
+
+        [ForeignKey(nameof(PositionId))]
+        public Position? Position { get; set; }
     }
 }
