@@ -41,6 +41,32 @@ public class EfVacationRequestRepository : IVacationRequestRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<VacationRequest>> GetAllAsync()
+    {
+        return await _context.VacationRequests
+            .Include(vr => vr.User)
+            .OrderByDescending(vr => vr.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<VacationRequest>> GetByPositionIdAsync(int positionId)
+    {
+        return await _context.VacationRequests
+            .Include(vr => vr.User)
+            .Where(vr => vr.User!.PositionId == positionId)
+            .OrderByDescending(vr => vr.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<VacationRequest>> GetByStatusAsync(VacationRequestStatus status)
+    {
+        return await _context.VacationRequests
+            .Include(vr => vr.User)
+            .Where(vr => vr.Status == status)
+            .OrderByDescending(vr => vr.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(VacationRequest request)
     {
         await _context.VacationRequests.AddAsync(request);

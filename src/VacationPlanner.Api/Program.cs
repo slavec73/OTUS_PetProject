@@ -114,6 +114,7 @@ builder.Services.AddScoped<IVacationApprovalRepository, EfVacationApprovalReposi
 //---РЕГИСТРАЦИЯ СЕРВИСОВ(добавить к существующим Scoped - регистрациям)-- -
 builder.Services.AddScoped<IVacationRequestService, VacationRequestService>();
 builder.Services.AddScoped<IVacationService, VacationService>();
+builder.Services.AddScoped<IHrService, HrService>();
 
 //---РЕГИСТРАЦИЯ ВАЛИДАТОРОВ(добавить к существующим)-- -
 builder.Services.AddScoped<IValidator<CreateVacationRequest>, CreateVacationRequestValidator>();

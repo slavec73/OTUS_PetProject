@@ -56,6 +56,12 @@ namespace VacationPlanner.Models.DbModels
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<User>()
+                .HasOne(u => u.Position)
+                .WithMany()
+                .HasForeignKey(u => u.PositionId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             builder.Entity<Role>().HasData(
                 new Role { RoleId = WellKnownRoles.AdministratorId, Name = WellKnownRoles.Administrator },
                 new Role { RoleId = WellKnownRoles.HrId, Name = WellKnownRoles.Hr },
@@ -78,43 +84,43 @@ namespace VacationPlanner.Models.DbModels
             );
 
             builder.Entity<VacationRequest>(entity =>
-         {
-             entity.HasKey(e => e.VacationRequestId);
-             entity.HasOne(e => e.User)
-                   .WithMany()
-                   .HasForeignKey(e => e.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
-             entity.Property(e => e.Reason).HasMaxLength(500);
-             entity.Property(e => e.Comment).HasMaxLength(500);
-         });
+            {
+                entity.HasKey(e => e.VacationRequestId);
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.Reason).HasMaxLength(500);
+                entity.Property(e => e.Comment).HasMaxLength(500);
+            });
 
             builder.Entity<VacationApproval>(entity =>
-                    {
-                        entity.HasKey(e => e.VacationApprovalId);
-                        entity.HasOne(e => e.VacationRequest)
-                              .WithMany(vr => vr.Approvals)
-                              .HasForeignKey(e => e.VacationRequestId)
-                              .OnDelete(DeleteBehavior.Cascade);
-                        entity.HasOne(e => e.ApproverUser)
-                              .WithMany()
-                              .HasForeignKey(e => e.ApproverUserId)
-                              .OnDelete(DeleteBehavior.Restrict);
-                        entity.Property(e => e.Comment).HasMaxLength(500);
-                    });
+            {
+                entity.HasKey(e => e.VacationApprovalId);
+                entity.HasOne(e => e.VacationRequest)
+                      .WithMany(vr => vr.Approvals)
+                      .HasForeignKey(e => e.VacationRequestId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.ApproverUser)
+                      .WithMany()
+                      .HasForeignKey(e => e.ApproverUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.Comment).HasMaxLength(500);
+            });
 
             builder.Entity<Vacation>(entity =>
-                    {
-                        entity.HasKey(e => e.VacationId);
-                        entity.HasOne(e => e.User)
-                              .WithMany()
-                              .HasForeignKey(e => e.UserId)
-                              .OnDelete(DeleteBehavior.Restrict);
-                        entity.HasOne(e => e.VacationRequest)
-                              .WithMany()
-                              .HasForeignKey(e => e.VacationRequestId)
-                              .OnDelete(DeleteBehavior.SetNull);
-                        entity.Property(e => e.VacationType).HasMaxLength(200);
-                    });
+            {
+                entity.HasKey(e => e.VacationId);
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.VacationRequest)
+                      .WithMany()
+                      .HasForeignKey(e => e.VacationRequestId)
+                      .OnDelete(DeleteBehavior.SetNull);
+                entity.Property(e => e.VacationType).HasMaxLength(200);
+            });
         }
     }
 }

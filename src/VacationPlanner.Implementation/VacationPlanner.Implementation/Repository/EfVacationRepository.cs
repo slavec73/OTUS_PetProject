@@ -12,7 +12,21 @@ public class EfVacationRepository : IVacationRepository
     {
         _context = context;
     }
-
+    public async Task<IEnumerable<Vacation>> GetAllAsync()
+    {
+        return await _context.Vacations
+            .Include(v => v.User)
+            .OrderByDescending(v => v.DateFrom)
+            .ToListAsync();
+    }
+    public async Task<IEnumerable<Vacation>> GetByDateRangeAsync(DateTime from, DateTime to)
+    {
+        return await _context.Vacations
+            .Include(v => v.User)
+            .Where(v => v.DateFrom >= from && v.DateTo <= to)
+            .OrderByDescending(v => v.DateFrom)
+            .ToListAsync();
+    }
     public async Task<IEnumerable<Vacation>> GetByUserIdAsync(Guid userId)
     {
         return await _context.Vacations
