@@ -22,12 +22,11 @@ using VacationPlanner.Models.DbModels;
 using VacationPlanner.Models.Options;
 using VacationPlanner.Models.Requests;
 using VacationPlanner.Validators;
-using VacationPlanner.Models.Enums;
-using VacationPlanner.Models.Requests;
-using VacationPlanner.Implementation.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddLog4Net("log4net.config");
 
 // Add services to the container.
 
