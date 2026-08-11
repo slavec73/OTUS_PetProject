@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using VacationPlanner.Core.Events;
 using VacationPlanner.Interfaces.Helpers;
 using VacationPlanner.Interfaces.Infrastructure;
@@ -17,30 +18,35 @@ namespace VacationPlanner.Implementation.Services
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IEventDispatcher _eventDispatcher;
+        private readonly ILogger<AuthService> _logger;
 
         public AuthService(
             IJwtService jwtService,
             ICacheService cacheService,
             IUserRepository userRepository,
             IRoleRepository roleRepository,
-            IEventDispatcher eventDispatcher)
+            IEventDispatcher eventDispatcher,
+            ILogger<AuthService> logger)
         {
             _jwtService = jwtService;
             _cacheService = cacheService;
             _userRepository = userRepository;
             _eventDispatcher = eventDispatcher;
             _roleRepository = roleRepository;
+            _logger = logger;
         }
 
 
         public async Task RegisterAsync(RegisterRequest request)
         {
+            _logger.LogInformation("Start Regitration User");
             var email = request.Email.Trim().ToLower();
 
             var user = await _userRepository.FindUserByEmailAsync(email);
 
             if (user is not null)
             {
+                _logger.LogError($"Registration with existed email: {request.Email}");
                 throw new InvalidOperationException(
                     "Пользователь с таким Email уже существует");
             }
@@ -51,6 +57,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (employeeRole == null)
             {
+                _logger.LogError("Role Employee not found");
                 throw new InvalidOperationException(
                     "Роль Employee не найдена");
             }
@@ -83,10 +90,12 @@ namespace VacationPlanner.Implementation.Services
                     createdUser.UserId,
                     createdUser.Email,
                     createdUser.FirstName));
+            _logger.LogInformation("End Regitration User");
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
+            _logger.LogInformation("Start Authentication User");
             var email = request.Email.Trim().ToLower();
 
 
@@ -95,6 +104,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (user == null)
             {
+                _logger.LogError("Incorrect email or password");
                 throw new InvalidOperationException(
                     "Неверный email или пароль");
             }
@@ -107,6 +117,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (!passwordValid)
             {
+                _logger.LogError("Incorrect email or password");
                 throw new InvalidOperationException(
                     "Неверный email или пароль");
             }
@@ -114,6 +125,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (!user.IsActive)
             {
+                _logger.LogError($"User with id: {user.UserId} is locked");
                 throw new InvalidOperationException(
                     "Пользователь заблокирован");
             }
@@ -127,7 +139,7 @@ namespace VacationPlanner.Implementation.Services
                 $"refresh_token:{refreshToken}",
                 user.UserId.ToString(),
                 TimeSpan.FromDays(7));
-
+            _logger.LogInformation("End Authentication User");
             return new LoginResponse
             {
                 UserId = user.UserId,
@@ -140,6 +152,7 @@ namespace VacationPlanner.Implementation.Services
 
         public async Task<LoginResponse> RefreshTokenAsync(string refreshToken)
         {
+            _logger.LogInformation("Start refresh token");
             var key = $"refresh_token:{refreshToken}";
 
 
@@ -148,6 +161,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (string.IsNullOrEmpty(userIdValue))
             {
+                _logger.LogError("Refresh token is expired");
                 throw new InvalidOperationException(
                     "Refresh token недействителен");
             }
@@ -161,6 +175,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (user == null)
             {
+                _logger.LogError($"User with id: {userId} not found");
                 throw new InvalidOperationException(
                     "Пользователь не найден");
             }
@@ -180,7 +195,7 @@ namespace VacationPlanner.Implementation.Services
                 user.UserId.ToString(),
                 TimeSpan.FromDays(7));
 
-
+            _logger.LogInformation("End Refresh Token");
             return new LoginResponse
             {
                 UserId = user.UserId,
@@ -194,11 +209,13 @@ namespace VacationPlanner.Implementation.Services
 
         public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
         {
+            _logger.LogInformation("Start Change Password");
             var user = await _userRepository.FindUserByIdAsync(userId);
 
 
             if (user == null)
             {
+                _logger.LogError($"user with id: {userId} not found");
                 throw new InvalidOperationException(
                     "Пользователь не найден");
             }
@@ -211,6 +228,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (!passwordValid)
             {
+                _logger.LogError("Current Password is incorrect");
                 throw new InvalidOperationException(
                     "Текущий пароль неверный");
             }
@@ -218,6 +236,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (request.CurrentPassword == request.NewPassword)
             {
+                _logger.LogError("Current password and new password are equals");
                 throw new InvalidOperationException(
                     "Новый пароль должен отличаться от текущего");
             }
@@ -231,11 +250,13 @@ namespace VacationPlanner.Implementation.Services
                     user.UserId,
                     user.Email,
                     user.FirstName));
+            _logger.LogInformation("End Change Password");
         }
 
         public async Task ForgotPasswordAsync(
     ForgotPasswordRequest request)
         {
+            _logger.LogInformation("Start ForgotPassword");
             var email = request.Email
                 .Trim()
                 .ToLower();
@@ -246,7 +267,10 @@ namespace VacationPlanner.Implementation.Services
 
             // Не говорим пользователю существует email или нет
             if (user == null)
+            {
+                _logger.LogWarning("User not found");
                 return;
+            }
 
 
             var code = Random.Shared
@@ -271,11 +295,13 @@ namespace VacationPlanner.Implementation.Services
                     user.UserId,
                     user.Email,
                     code));
+            _logger.LogInformation("End forgot password");
         }
 
         public async Task ResetPasswordAsync(
     ResetPasswordRequest request)
         {
+            _logger.LogInformation("Start reset password");
             var email = request.Email
                 .Trim()
                 .ToLower();
@@ -287,6 +313,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (string.IsNullOrEmpty(dataJson))
             {
+                _logger.LogError("Code for reset password is expired or not found");
                 throw new InvalidOperationException(
                     "Код недействителен или истек");
             }
@@ -300,6 +327,7 @@ namespace VacationPlanner.Implementation.Services
             if (resetData == null ||
                 resetData.Code != request.Code)
             {
+                _logger.LogError("Invalid reset code");
                 throw new InvalidOperationException(
                     "Неверный код");
             }
@@ -308,6 +336,7 @@ namespace VacationPlanner.Implementation.Services
 
             if (user == null)
             {
+                _logger.LogError($"User with id: {resetData.UserId} not found");
                 throw new InvalidOperationException(
                     "Пользователь не найден");
             }
@@ -324,6 +353,7 @@ namespace VacationPlanner.Implementation.Services
                     user.UserId,
                     user.Email,
                     user.FirstName));
+            _logger.LogInformation("End reset password");
         }
     }
 }

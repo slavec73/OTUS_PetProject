@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.DbModels;
 
@@ -7,10 +8,12 @@ namespace VacationPlanner.Implementation.Services
     public class UserRoleService : IUserRoleService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<UserRoleService> _logger;
 
-        public UserRoleService(ApplicationDbContext context)
+        public UserRoleService(ApplicationDbContext context, ILogger<UserRoleService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
@@ -32,12 +35,18 @@ namespace VacationPlanner.Implementation.Services
 
         public async Task<UserDto?> GetUserByIdAsync(Guid userId)
         {
+            _logger.LogInformation("Start Get User by Id");
             var user = await _context.Users
                 .Include(x => x.Role)
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (user == null)
+            {
+                _logger.LogWarning($"user with id: {userId} not found");
                 return null;
+            }
+
+            _logger.LogInformation("End Get User by Id");
 
             return new UserDto
             {
@@ -71,16 +80,20 @@ namespace VacationPlanner.Implementation.Services
 
         public async Task<bool> ChangeUserRoleAsync(Guid userId, Guid roleId)
         {
+            _logger.LogInformation("Start Change User Role");
             var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (user == null)
+            {
+                _logger.LogWarning($"user with id: {userId} not found");
                 return false;
+            }
 
             user.RoleId = roleId;
 
             await _context.SaveChangesAsync();
-
+            _logger.LogInformation("End Change User Role");
             return true;
         }
 
@@ -93,13 +106,21 @@ namespace VacationPlanner.Implementation.Services
 
         public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
         {
+            _logger.LogInformation($"Start Get User Roles");
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null || user.Role == null)
+            {
+                if (user == null)
+                    _logger.LogWarning($"user with id: {userId} not found");
+                if (user.Role == null)
+                    _logger.LogWarning($"user with id: {userId} doesn't have role");
                 return Enumerable.Empty<string>();
+            }
 
+            _logger.LogInformation($"End Get User Roles");
             return new List<string>
             {
                 user.Role.Name

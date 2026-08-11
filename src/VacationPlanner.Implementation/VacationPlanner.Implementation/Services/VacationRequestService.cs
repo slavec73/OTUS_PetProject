@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using VacationPlanner.Interfaces.Repository;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.DbModels;
@@ -9,41 +10,57 @@ namespace VacationPlanner.Implementation.Services
     {
         private readonly IVacationRequestRepository _requestRepository;
         private readonly IVacationApprovalRepository _approvalRepository;
+        private readonly ILogger<VacationRequestService> _logger;
 
         public VacationRequestService(
             IVacationRequestRepository requestRepository,
-            IVacationApprovalRepository approvalRepository)
+            IVacationApprovalRepository approvalRepository,
+            ILogger<VacationRequestService> logger)
         {
             _requestRepository = requestRepository;
             _approvalRepository = approvalRepository;
+            _logger = logger;
         }
 
         public async Task<VacationRequestDto?> GetByIdAsync(Guid id, Guid currentUserId)
         {
+            _logger.LogInformation("Start get rerquest by id");
             var request = await _requestRepository.GetByIdAsync(id);
             if (request == null)
+            {
+                _logger.LogWarning($"request by id: {id} not found");
                 return null;
+            }
 
             if (request.UserId != currentUserId)
+            {
+                _logger.LogWarning($"The current user is not the author of the request with id: {id}");
                 return null;
+            }
 
+            _logger.LogInformation("End get rerquest by id");
             return MapToDto(request);
         }
 
         public async Task<IEnumerable<VacationRequestDto>> GetMyRequestsAsync(Guid userId)
         {
+            _logger.LogInformation("Start get rerquests by userid");
             var requests = await _requestRepository.GetByUserIdAsync(userId);
+            _logger.LogInformation("End get rerquests by userid");
             return requests.Select(MapToDto);
         }
 
         public async Task<IEnumerable<VacationRequestDto>> GetPendingApprovalsAsync(Guid approverUserId)
         {
+            _logger.LogInformation("Start get pending rerquests by userid");
             var requests = await _requestRepository.GetPendingApprovalsForApproverAsync(approverUserId);
+            _logger.LogInformation("Start get pending rerquests by userid");
             return requests.Select(MapToDto);
         }
 
         public async Task<VacationRequestDto> CreateAsync(CreateVacationRequestDto dto, Guid userId)
         {
+            _logger.LogInformation("Start create rerquest");
             var request = new VacationRequest
             {
                 UserId = userId,
@@ -57,20 +74,33 @@ namespace VacationPlanner.Implementation.Services
 
             await _requestRepository.AddAsync(request);
             await _requestRepository.SaveChangesAsync();
+            _logger.LogInformation("End creating request");
 
             return MapToDto(request);
         }
 
         public async Task<VacationRequestDto> UpdateDraftAsync(Guid id, UpdateVacationRequestDto dto, Guid userId)
         {
-            var request = await _requestRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("Заявка не найдена");
+            _logger.LogInformation("Start update draft rerquest by id");
+            var request = await _requestRepository.GetByIdAsync(id);
+
+            if (request is null)
+            {
+                _logger.LogError($"request with id: {id} not found");
+                throw new InvalidOperationException("Заявка не найдена");
+            }
 
             if (request.UserId != userId)
+            {
+                _logger.LogError($"user with id: {userId} not have access to request with id :{id}");
                 throw new UnauthorizedAccessException("Нет доступа к этой заявке");
+            }
 
             if (request.Status != VacationRequestStatus.Draft)
+            {
+                _logger.LogError($"status request with id: {id} no equal Draft");
                 throw new InvalidOperationException("Можно редактировать только заявки в статусе \"Черновик\"");
+            }
 
             request.Reason = dto.Reason;
             request.DateFrom = dto.DateFrom;
@@ -81,19 +111,32 @@ namespace VacationPlanner.Implementation.Services
             _requestRepository.Update(request);
             await _requestRepository.SaveChangesAsync();
 
+            _logger.LogInformation("End update draft rerquest by id");
             return MapToDto(request);
         }
 
         public async Task<VacationRequestDto> SubmitForApprovalAsync(Guid id, Guid userId)
         {
-            var request = await _requestRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("Заявка не найдена");
+            _logger.LogInformation($"Start submit request");
+            var request = await _requestRepository.GetByIdAsync(id);
+            if (request is null)
+            {
+                _logger.LogError($"status request with id: {id} not fount");
+                throw new InvalidOperationException("Заявка не найдена");
+            }
+
 
             if (request.UserId != userId)
+            {
+                _logger.LogError($"user with id: {userId} not have access to request with id :{id}");
                 throw new UnauthorizedAccessException("Нет доступа к этой заявке");
+            }
 
             if (request.Status != VacationRequestStatus.Draft)
-                throw new InvalidOperationException("Можно отправить на согласование только заявки в статусе \"Черновик\"");
+            {
+                _logger.LogError($"status request with id: {id} no equal Draft");
+                throw new InvalidOperationException("Можно редактировать только заявки в статусе \"Черновик\"");
+            }
 
             request.Status = VacationRequestStatus.PendingFirstApproval;
             request.UpdatedAt = DateTime.UtcNow;
@@ -110,7 +153,7 @@ namespace VacationPlanner.Implementation.Services
             await _approvalRepository.AddAsync(approval);
 
             await _requestRepository.SaveChangesAsync();
-
+            _logger.LogInformation($"End submit request");
             return MapToDto(request);
         }
 
