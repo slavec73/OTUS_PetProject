@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+
+		<PackageReference Include="Moq" Version="4.20.72" />
+		<PackageReference Include="FluentAssertions" Version="8.10.0" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\VacationPlanner.Api\VacationPlanner.csproj" />
+    <ProjectReference Include="..\src\VacationPlanner.Implementation\VacationPlanner.Implementation\VacationPlanner.Implementation.csproj" />
+    <ProjectReference Include="..\src\VacationPlanner.Interfaces\VacationPlanner.Interfaces\VacationPlanner.Interfaces.csproj" />
+    <ProjectReference Include="..\VacationPlanner.Common\VacationPlanner.Core.csproj" />
+    <ProjectReference Include="..\VacationPlanner.Models\VacationPlanner.Models.csproj" />
+  </ItemGroup>
+
+</Project>
