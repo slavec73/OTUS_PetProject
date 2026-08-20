@@ -67,7 +67,7 @@ namespace VacationPlanner.Implementation.Services
                 throw new InvalidOperationException("Заявка не найдена");
             }
 
-            if (request.Status != VacationRequestStatus.PendingFirstApproval)
+            if (request.Status != VacationRequestStatus.PendingSecondApproval)
             {
                 _logger.LogError($"status reqeust with id: {requestId} not equal PendingFirstApproval");
                 throw new InvalidOperationException("Можно согласовать только заявки в статусе \"На согласовании\"");
@@ -82,7 +82,7 @@ namespace VacationPlanner.Implementation.Services
             var approval = new VacationApproval
             {
                 VacationRequestId = requestId,
-                ApprovalStage = 1,
+                ApprovalStage = 3,
                 ApproverUserId = hrUserId,
                 Decision = VacationRequestStatus.Approved,
                 Comment = comment

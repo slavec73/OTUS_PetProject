@@ -105,6 +105,7 @@ builder.Services.AddScoped<IEventHandler<PasswordChangedEvent>, PasswordChangedN
 builder.Services.AddScoped<IEventHandler<PasswordRestoreRequestedEvent>, PasswordRestoreRequestedNotificationHandler>();
 
 
+
 //---РЕГИСТРАЦИЯ РЕПОЗИТОРИЕВ(добавить к существующим Scoped - регистрациям)-- -
 builder.Services.AddScoped<IVacationRequestRepository, EfVacationRequestRepository>();
 builder.Services.AddScoped<IVacationRepository, EfVacationRepository>();
@@ -114,6 +115,7 @@ builder.Services.AddScoped<IVacationApprovalRepository, EfVacationApprovalReposi
 builder.Services.AddScoped<IVacationRequestService, VacationRequestService>();
 builder.Services.AddScoped<IVacationService, VacationService>();
 builder.Services.AddScoped<IHrService, HrService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
 
 //---РЕГИСТРАЦИЯ ВАЛИДАТОРОВ(добавить к существующим)-- -
 builder.Services.AddScoped<IValidator<CreateVacationRequest>, CreateVacationRequestValidator>();
@@ -152,12 +154,13 @@ builder.Services.AddSwaggerGen(options =>
             }
         });
 });
-
+Console.WriteLine("1. До builder.Build()");
 var app = builder.Build();
-
+Console.WriteLine("2. После builder.Build()");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    Console.WriteLine("3. Development");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -169,6 +172,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+Console.WriteLine("4. Перед app.Run()");
 app.Run();
 
