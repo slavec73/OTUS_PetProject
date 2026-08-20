@@ -15,7 +15,7 @@ namespace VacationPlanner.Models.DbModels
         public DbSet<VacationRequest> VacationRequests => Set<VacationRequest>();
         public DbSet<VacationApproval> VacationApprovals => Set<VacationApproval>();
         public DbSet<Vacation> Vacations => Set<Vacation>();
-
+        public DbSet<Department> Departments => Set<Department>();
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -61,6 +61,25 @@ namespace VacationPlanner.Models.DbModels
                 .WithMany()
                 .HasForeignKey(u => u.PositionId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<User>(e =>
+            {
+                e.HasOne(u => u.Department)
+                              .WithMany(d => d.Users)
+                              .HasForeignKey(u => u.DepartmentId)
+                              .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            builder.Entity<Department>(e =>
+                 {
+                     e.HasKey(d => d.DepartmentId);
+                     e.HasOne(d => d.Manager)
+                                   .WithMany()
+                                   .HasForeignKey(d => d.ManagerId)
+                                   .OnDelete(DeleteBehavior.Restrict);
+                     e.Property(d => d.Name).HasMaxLength(200);
+                     e.Property(d => d.Description).HasMaxLength(500);
+                 });
 
             builder.Entity<Role>().HasData(
                 new Role { RoleId = WellKnownRoles.AdministratorId, Name = WellKnownRoles.Administrator },

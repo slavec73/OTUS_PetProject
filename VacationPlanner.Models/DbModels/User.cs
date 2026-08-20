@@ -2,7 +2,7 @@
 
 namespace VacationPlanner.Models.DbModels
 {
-    public class User
+    public partial class User
     {
         public Guid UserId { get; set; }
 
