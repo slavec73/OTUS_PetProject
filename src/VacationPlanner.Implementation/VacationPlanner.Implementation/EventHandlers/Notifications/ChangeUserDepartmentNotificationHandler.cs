@@ -30,10 +30,13 @@ namespace VacationPlanner.Implementation.EventHandlers.Notifications
                 Body = string.IsNullOrEmpty(domainEvent.OldDepartmentName) ?
                string.Format(
     Messages.FirstAcceptToDeparmentMessage,
+    domainEvent.NewPositionName,
     domainEvent.NewDepartmentName)
                : string.Format(
     Messages.ChangeDepartmentMessage,
+    domainEvent.OldPositionName,
     domainEvent.OldDepartmentName,
+    domainEvent.NewPositionName,
     domainEvent.NewDepartmentName)
             };
 

@@ -12,7 +12,7 @@ namespace VacationPlanner.Interfaces.Services
 
         Task<ChangeUserPropertiesResponse> ChangeUserRoleAsync(Guid userId, Guid roleId);
 
-        Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId);
+        Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId, int positionId);
 
         Task<IEnumerable<string>> GetAllRolesAsync();
 

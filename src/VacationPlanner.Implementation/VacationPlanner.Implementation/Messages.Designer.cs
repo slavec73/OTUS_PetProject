@@ -61,7 +61,7 @@ namespace VacationPlanner.Implementation {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы переведены из департамента - {0} в {1}.
+        ///   Ищет локализованную строку, похожую на Вы переведены c должности: {0} департамента: {1} на должность: {2} департамента: {3}.
         /// </summary>
         internal static string ChangeDepartmentMessage {
             get {
@@ -97,7 +97,7 @@ namespace VacationPlanner.Implementation {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы приняты в департамент - {0}.
+        ///   Ищет локализованную строку, похожую на Вы назначены на должность: {0} департамента: {1}.
         /// </summary>
         internal static string FirstAcceptToDeparmentMessage {
             get {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using VacationPlanner.Interfaces.Repository;
 using VacationPlanner.Interfaces.Services;
+using VacationPlanner.Models.DbModels;
 
 namespace VacationPlanner.Implementation.Services
 {
@@ -59,9 +60,9 @@ namespace VacationPlanner.Implementation.Services
             return global.DefaultVacationDays;
         }
 
-        public Task<int> GetVacationDurationForUserAsync(string userId)
+        public async Task<PositionVacationSetting> GetVacationDurationForUserAsync(int positionId)
         {
-            throw new NotImplementedException();
+            return await _repository.GetSettingByPositionIdAsync(positionId);
         }
     }
 }
