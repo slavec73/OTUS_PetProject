@@ -129,6 +129,7 @@ builder.Services.AddScoped<IManagerService, ManagerService>();
 //---РЕГИСТРАЦИЯ ВАЛИДАТОРОВ(добавить к существующим)-- -
 builder.Services.AddScoped<IValidator<CreateVacationRequest>, CreateVacationRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateVacationRequest>, UpdateVacationRequestValidator>();
+builder.Services.AddScoped<IValidator<ChangeUserDepartmentRequest>, ChangeUserDepartmentRequestValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

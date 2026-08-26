@@ -128,12 +128,14 @@ namespace VacationPlanner.Implementation.Services
             return response;
         }
 
+        public async Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId, int positionId)
         public async Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId)
         {
             _logger.LogInformation("Start Change User Role");
             var response = new ChangeUserPropertiesResponse();
             var user = await _context.Users
                 .Include(x => x.Department)
+                .Include(x => x.Position)
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (user == null)
@@ -143,6 +145,13 @@ namespace VacationPlanner.Implementation.Services
                 response.Message = $"user with id: {userId} not found";
                 return response;
             }
+
+            var newDeparment = await _context.Departments
+                .FirstOrDefaultAsync(x => x.DepartmentId == departmentId);
+
+            var newPosition = await _context.Positions
+                .FirstOrDefaultAsync(x => x.Id == positionId);
+
             var newDeparment = await _context.Departments
                 .FirstOrDefaultAsync(x => x.DepartmentId == departmentId);
 
@@ -153,6 +162,24 @@ namespace VacationPlanner.Implementation.Services
                 response.Message = $"deparment with id: {departmentId} not found";
                 return response;
             }
+
+            if (newPosition is null)
+            {
+                _logger.LogWarning($"position with id: {positionId} not found");
+                response.Success = false;
+                response.Message = $"position with id: {positionId} not found";
+                return response;
+            }
+
+            var @event = new ChangeUserDepartmentEvent(
+                    user.Email,
+                    user.Department?.Name,
+                    newDeparment.Name,
+                    user.Position?.Name,
+                    newPosition.Name);
+
+            user.DepartmentId = departmentId;
+            user.PositionId = positionId;
             var @event = new ChangeUserDepartmentEvent(
                     user.Email,
                     user.Department?.Name,

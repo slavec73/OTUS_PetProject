@@ -10,6 +10,7 @@ namespace VacationPlanner.Implementation.Services
     {
         private readonly IVacationRequestRepository _requestRepository;
         private readonly IVacationApprovalRepository _approvalRepository;
+        private readonly IVacationDurationRepository _vacationDurationRepository;
         private readonly IUserRepository _userRepository;
         private readonly ILogger<VacationRequestService> _logger;
 
@@ -17,11 +18,13 @@ namespace VacationPlanner.Implementation.Services
             IVacationRequestRepository requestRepository,
             IVacationApprovalRepository approvalRepository,
             IUserRepository userRepository,
+            IVacationDurationRepository vacationDurationRepository,
             ILogger<VacationRequestService> logger)
         {
             _requestRepository = requestRepository;
             _approvalRepository = approvalRepository;
             _userRepository = userRepository;
+            _vacationDurationRepository = vacationDurationRepository;
             _logger = logger;
         }
 
@@ -68,6 +71,18 @@ namespace VacationPlanner.Implementation.Services
             if (author.DepartmentId is null)
             {
                 throw new InvalidOperationException("Вы не приняты в подразделение. Обратитесь к администратору системы");
+            }
+
+            if (author.PositionId is null)
+            {
+                throw new InvalidOperationException("Вы не назначены на должность. Обратитесь к администратору системы");
+            }
+
+            var vacationSetting = await _vacationDurationRepository.GetSettingByPositionIdAsync(author.PositionId.Value);
+
+            if (vacationSetting.VacationDays < (dto.DateTo - dto.DateFrom).Days)
+            {
+                throw new InvalidOperationException($"Указанный длинее чем количество дней положенных по вашей должности: {vacationSetting.VacationDays}");
             }
 
             var request = new VacationRequest

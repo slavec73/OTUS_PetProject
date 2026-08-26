@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.DbModels;
+using VacationPlanner.Models.Requests;
 
 namespace VacationPlanner.Api.Controllers
 {
@@ -113,6 +114,9 @@ namespace VacationPlanner.Api.Controllers
         }
 
         [HttpPost("users/{userId}/department")]
+        public async Task<IActionResult> ChangeUserDepartment(Guid userId, [FromBody] ChangeUserDepartmentRequest request)
+        {
+            var response = await _userRoleService.ChangeUserDepartmentAsync(userId, request.DepartmentId, request.PositionId);
         public async Task<IActionResult> ChangeUserDepartment(Guid userId, [FromBody] int departmentId)
         {
             var response = await _userRoleService.ChangeUserDepartmentAsync(userId, departmentId);

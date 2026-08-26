@@ -118,6 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChangeDepartmentMessage" xml:space="preserve">
+    <value>Вы переведены c должности: {0} департамента: {1} на должность: {2} департамента: {3}</value>
     <value>Вы переведены из департамента - {0} в {1}</value>
   </data>
   <data name="ChangeUserRoleMessage" xml:space="preserve">
@@ -130,6 +131,7 @@
     <value>Ваша заявка на отпуск №{0} успешно создана.</value>
   </data>
   <data name="FirstAcceptToDeparmentMessage" xml:space="preserve">
+    <value>Вы назначены на должность: {0} департамента: {1}</value>
     <value>Вы приняты в департамент - {0}</value>
   </data>
   <data name="RequestApprovedByHrMessage" xml:space="preserve">
