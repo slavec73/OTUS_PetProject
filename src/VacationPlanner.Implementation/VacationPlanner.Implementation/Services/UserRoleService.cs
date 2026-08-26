@@ -129,6 +129,7 @@ namespace VacationPlanner.Implementation.Services
         }
 
         public async Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId, int positionId)
+        public async Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId)
         {
             _logger.LogInformation("Start Change User Role");
             var response = new ChangeUserPropertiesResponse();
@@ -150,6 +151,9 @@ namespace VacationPlanner.Implementation.Services
 
             var newPosition = await _context.Positions
                 .FirstOrDefaultAsync(x => x.Id == positionId);
+
+            var newDeparment = await _context.Departments
+                .FirstOrDefaultAsync(x => x.DepartmentId == departmentId);
 
             if (newDeparment is null)
             {
@@ -176,6 +180,11 @@ namespace VacationPlanner.Implementation.Services
 
             user.DepartmentId = departmentId;
             user.PositionId = positionId;
+            var @event = new ChangeUserDepartmentEvent(
+                    user.Email,
+                    user.Department?.Name,
+                    newDeparment.Name);
+            user.DepartmentId = departmentId;
 
             await _context.SaveChangesAsync();
 
