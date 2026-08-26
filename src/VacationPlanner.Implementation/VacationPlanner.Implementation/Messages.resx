@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ChangeDepartmentMessage" xml:space="preserve">
+    <value>Вы переведены из департамента - {0} в {1}</value>
+  </data>
+  <data name="ChangeUserRoleMessage" xml:space="preserve">
+    <value>Вам назначена новая роль - {0}</value>
+  </data>
   <data name="CreatedVacationMessage" xml:space="preserve">
     <value>Для вас создан отпуск №{0}.</value>
   </data>
   <data name="CreatedVacationRequestMessage" xml:space="preserve">
     <value>Ваша заявка на отпуск №{0} успешно создана.</value>
+  </data>
+  <data name="FirstAcceptToDeparmentMessage" xml:space="preserve">
+    <value>Вы приняты в департамент - {0}</value>
   </data>
   <data name="RequestApprovedByHrMessage" xml:space="preserve">
     <value>Ваша заявка №{0} полностью согласована.</value>

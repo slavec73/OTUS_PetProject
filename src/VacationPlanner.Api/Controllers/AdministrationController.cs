@@ -106,9 +106,18 @@ namespace VacationPlanner.Api.Controllers
         [HttpPost("users/{userId}/role")]
         public async Task<IActionResult> ChangeUserRole(Guid userId, [FromBody] Guid newRole)
         {
-            var success = await _userRoleService.ChangeUserRoleAsync(userId, newRole);
-            if (!success)
-                return NotFound("User not found");
+            var response = await _userRoleService.ChangeUserRoleAsync(userId, newRole);
+            if (!response.Success)
+                return BadRequest(response.Message);
+            return Ok();
+        }
+
+        [HttpPost("users/{userId}/department")]
+        public async Task<IActionResult> ChangeUserDepartment(Guid userId, [FromBody] int departmentId)
+        {
+            var response = await _userRoleService.ChangeUserDepartmentAsync(userId, departmentId);
+            if (!response.Success)
+                return BadRequest(response.Message);
             return Ok();
         }
     }

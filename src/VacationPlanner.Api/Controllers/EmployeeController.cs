@@ -1,7 +1,6 @@
-using System.Security.Claims;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.Requests;
 using VacationPlanner.Models.Responses;
@@ -77,15 +76,28 @@ public class EmployeeController : ControllerBase
     public async Task<ActionResult<VacationRequestResponse>> Create(
         [FromBody] CreateVacationRequest request)
     {
-        var userId = GetCurrentUserId();
-        var dto = new CreateVacationRequestDto(
-            request.Reason,
-            request.DateFrom,
-            request.DateTo,
-            request.Comment);
+        try
+        {
+            var userId = GetCurrentUserId();
+            var dto = new CreateVacationRequestDto(
+                request.Reason,
+                request.DateFrom,
+                request.DateTo,
+                request.Comment);
 
-        var created = await _vacationRequestService.CreateAsync(dto, userId);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, MapToResponse(created));
+            var created = await _vacationRequestService.CreateAsync(dto, userId);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, MapToResponse(created));
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("Вы не приняты в подразделение"))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
+            }
+
+            return BadRequest(ex.Message);
+        }
+
     }
 
     /// <summary>

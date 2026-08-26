@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using VacationPlanner.Core.Events;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.DbModels;
+using VacationPlanner.Models.Responses;
 
 namespace VacationPlanner.Implementation.Services
 {
@@ -9,11 +11,13 @@ namespace VacationPlanner.Implementation.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<UserRoleService> _logger;
+        private readonly IEventDispatcher _eventDispatcher;
 
-        public UserRoleService(ApplicationDbContext context, ILogger<UserRoleService> logger)
+        public UserRoleService(ApplicationDbContext context, ILogger<UserRoleService> logger, IEventDispatcher eventDispatcher)
         {
             _context = context;
             _logger = logger;
+            _eventDispatcher = eventDispatcher;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
@@ -78,23 +82,89 @@ namespace VacationPlanner.Implementation.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> ChangeUserRoleAsync(Guid userId, Guid roleId)
+        public async Task<ChangeUserPropertiesResponse> ChangeUserRoleAsync(Guid userId, Guid roleId)
         {
             _logger.LogInformation("Start Change User Role");
+            var response = new ChangeUserPropertiesResponse();
             var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (user == null)
             {
                 _logger.LogWarning($"user with id: {userId} not found");
-                return false;
+                response.Success = false;
+                response.Message = $"user with id: {userId} not found";
+                return response;
+            }
+            if (user.DepartmentId is null)
+            {
+                _logger.LogWarning($"user with id: {userId} not accepted to any department");
+                response.Success = false;
+                response.Message = $"user with id: {userId} not accepted to any department";
+                return response;
+            }
+
+            var newRole = await _context.Roles
+                .FirstOrDefaultAsync(x => x.RoleId == roleId);
+
+            if (newRole is null)
+            {
+                _logger.LogWarning($"role with id: {roleId} not found");
+                response.Success = false;
+                response.Message = $"role with id: {roleId} not found";
+                return response;
             }
 
             user.RoleId = roleId;
 
             await _context.SaveChangesAsync();
+
+            await _eventDispatcher.PublishAsync(
+                new ChangeUserRoleEvent(
+                    user.Email,
+                    newRole.Name));
             _logger.LogInformation("End Change User Role");
-            return true;
+            response.Success = true;
+            return response;
+        }
+
+        public async Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId)
+        {
+            _logger.LogInformation("Start Change User Role");
+            var response = new ChangeUserPropertiesResponse();
+            var user = await _context.Users
+                .Include(x => x.Department)
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            if (user == null)
+            {
+                _logger.LogWarning($"user with id: {userId} not found");
+                response.Success = false;
+                response.Message = $"user with id: {userId} not found";
+                return response;
+            }
+            var newDeparment = await _context.Departments
+                .FirstOrDefaultAsync(x => x.DepartmentId == departmentId);
+
+            if (newDeparment is null)
+            {
+                _logger.LogWarning($"deparment with id: {departmentId} not found");
+                response.Success = false;
+                response.Message = $"deparment with id: {departmentId} not found";
+                return response;
+            }
+            var @event = new ChangeUserDepartmentEvent(
+                    user.Email,
+                    user.Department?.Name,
+                    newDeparment.Name);
+            user.DepartmentId = departmentId;
+
+            await _context.SaveChangesAsync();
+
+            await _eventDispatcher.PublishAsync(@event);
+            _logger.LogInformation("End Change User Role");
+            response.Success = true;
+            return response;
         }
 
         public async Task<IEnumerable<string>> GetAllRolesAsync()

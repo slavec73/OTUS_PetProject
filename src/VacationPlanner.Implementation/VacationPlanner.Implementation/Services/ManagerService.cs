@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using VacationPlanner.Common.Events;
+using VacationPlanner.Core.Events;
 using VacationPlanner.Interfaces.Repository;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.DbModels;
@@ -13,18 +15,24 @@ namespace VacationPlanner.Implementation.Services
         private readonly ApplicationDbContext _context;
         private readonly IVacationRequestRepository _requestRepository;
         private readonly IVacationApprovalRepository _approvalRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ILogger<ManagerService> _logger;
+        private readonly IEventDispatcher _eventDispatcher;
 
         public ManagerService(
             ApplicationDbContext context,
             IVacationRequestRepository requestRepository,
             IVacationApprovalRepository approvalRepository,
-            ILogger<ManagerService> logger)
+            ILogger<ManagerService> logger,
+            IEventDispatcher eventDispatcher,
+            IUserRepository userRepository)
         {
             _context = context;
             _requestRepository = requestRepository;
             _approvalRepository = approvalRepository;
+            _userRepository = userRepository;
             _logger = logger;
+            _eventDispatcher = eventDispatcher;
         }
 
         public async Task<IEnumerable<ManagerVacationRequestDto>> GetPendingRequestsAsync(Guid managerId)
@@ -139,6 +147,12 @@ namespace VacationPlanner.Implementation.Services
 
             await _requestRepository.SaveChangesAsync();
 
+            await _eventDispatcher.PublishAsync(
+                new VacationRequestApprovedByManagerEvent(
+                    requestId,
+                    request.User.Email,
+                    managerId.ToString()));
+
             _logger.LogInformation($"End approve request: {requestId} by manager: {managerId}");
             return await LoadDtoAsync(requestId);
         }
@@ -178,6 +192,12 @@ namespace VacationPlanner.Implementation.Services
             await _approvalRepository.AddAsync(approval);
 
             await _requestRepository.SaveChangesAsync();
+
+            await _eventDispatcher.PublishAsync(
+                new VacationRequestRejectedByManagerEvent(
+                    requestId,
+                    request.User.Email,
+                    managerId.ToString()));
 
             _logger.LogInformation($"End return for revision request: {requestId} by manager: {managerId}");
             return await LoadDtoAsync(requestId);

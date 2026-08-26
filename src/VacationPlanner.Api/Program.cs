@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using System.Diagnostics;
 using System.Text;
 using VacationPlanner.Common.Events;
 using VacationPlanner.Core.Events;
@@ -57,7 +58,12 @@ builder.Services
     });
 var conf = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .LogTo(
+            message => Debug.WriteLine(message),
+            new[] { DbLoggerCategory.Database.Command.Name },
+            LogLevel.Information)
+        .EnableSensitiveDataLogging()); ;
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
@@ -75,6 +81,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IPositionRepository, EfPositionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
@@ -103,6 +110,8 @@ builder.Services.AddScoped<IEventHandler<VacationCreatedEvent>, VacationCreatedN
 builder.Services.AddScoped<IEventHandler<UserRegisteredEvent>, UserRegisteredNotificationHandler>();
 builder.Services.AddScoped<IEventHandler<PasswordChangedEvent>, PasswordChangedNotificationHandler>();
 builder.Services.AddScoped<IEventHandler<PasswordRestoreRequestedEvent>, PasswordRestoreRequestedNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<ChangeUserDepartmentEvent>, ChangeUserDepartmentNotificationHandler>();
+builder.Services.AddScoped<IEventHandler<ChangeUserRoleEvent>, ChangeUserRoleNotificationHandler>();
 
 
 

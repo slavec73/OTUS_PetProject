@@ -1,4 +1,6 @@
-﻿namespace VacationPlanner.Interfaces.Services
+﻿using VacationPlanner.Models.Responses;
+
+namespace VacationPlanner.Interfaces.Services
 {
     public interface IUserRoleService
     {
@@ -8,7 +10,9 @@
 
         Task<IEnumerable<UserDto>> GetUsersInRoleAsync(Guid roleId);
 
-        Task<bool> ChangeUserRoleAsync(Guid userId, Guid roleId);
+        Task<ChangeUserPropertiesResponse> ChangeUserRoleAsync(Guid userId, Guid roleId);
+
+        Task<ChangeUserPropertiesResponse> ChangeUserDepartmentAsync(Guid userId, int departmentId);
 
         Task<IEnumerable<string>> GetAllRolesAsync();
 

@@ -10,15 +10,18 @@ namespace VacationPlanner.Implementation.Services
     {
         private readonly IVacationRequestRepository _requestRepository;
         private readonly IVacationApprovalRepository _approvalRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ILogger<VacationRequestService> _logger;
 
         public VacationRequestService(
             IVacationRequestRepository requestRepository,
             IVacationApprovalRepository approvalRepository,
+            IUserRepository userRepository,
             ILogger<VacationRequestService> logger)
         {
             _requestRepository = requestRepository;
             _approvalRepository = approvalRepository;
+            _userRepository = userRepository;
             _logger = logger;
         }
 
@@ -61,6 +64,12 @@ namespace VacationPlanner.Implementation.Services
         public async Task<VacationRequestDto> CreateAsync(CreateVacationRequestDto dto, Guid userId)
         {
             _logger.LogInformation("Start create rerquest");
+            var author = await _userRepository.FindUserByIdAsync(userId);
+            if (author.DepartmentId is null)
+            {
+                throw new InvalidOperationException("Вы не приняты в подразделение. Обратитесь к администратору системы");
+            }
+
             var request = new VacationRequest
             {
                 UserId = userId,

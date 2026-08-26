@@ -61,6 +61,24 @@ namespace VacationPlanner.Implementation {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Вы переведены из департамента - {0} в {1}.
+        /// </summary>
+        internal static string ChangeDepartmentMessage {
+            get {
+                return ResourceManager.GetString("ChangeDepartmentMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вам назначена новая роль - {0}.
+        /// </summary>
+        internal static string ChangeUserRoleMessage {
+            get {
+                return ResourceManager.GetString("ChangeUserRoleMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Для вас создан отпуск №{0}..
         /// </summary>
         internal static string CreatedVacationMessage {
@@ -75,6 +93,15 @@ namespace VacationPlanner.Implementation {
         internal static string CreatedVacationRequestMessage {
             get {
                 return ResourceManager.GetString("CreatedVacationRequestMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вы приняты в департамент - {0}.
+        /// </summary>
+        internal static string FirstAcceptToDeparmentMessage {
+            get {
+                return ResourceManager.GetString("FirstAcceptToDeparmentMessage", resourceCulture);
             }
         }
         

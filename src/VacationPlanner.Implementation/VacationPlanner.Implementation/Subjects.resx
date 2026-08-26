@@ -120,6 +120,12 @@
   <data name="ChangePasswordSubject" xml:space="preserve">
     <value>Изменение пароля</value>
   </data>
+  <data name="ChangeUserDepartmentSubject" xml:space="preserve">
+    <value>Кадровое изменение</value>
+  </data>
+  <data name="ChangeUserRoleSubject" xml:space="preserve">
+    <value>Вам назначена новая роль</value>
+  </data>
   <data name="RegistrationSubject" xml:space="preserve">
     <value>Регистрация в VacationPlanner</value>
   </data>
