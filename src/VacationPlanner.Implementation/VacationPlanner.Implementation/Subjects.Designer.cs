@@ -70,6 +70,24 @@ namespace VacationPlanner.Implementation {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Кадровое изменение.
+        /// </summary>
+        internal static string ChangeUserDepartmentSubject {
+            get {
+                return ResourceManager.GetString("ChangeUserDepartmentSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вам назначена новая роль.
+        /// </summary>
+        internal static string ChangeUserRoleSubject {
+            get {
+                return ResourceManager.GetString("ChangeUserRoleSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Регистрация в VacationPlanner.
         /// </summary>
         internal static string RegistrationSubject {

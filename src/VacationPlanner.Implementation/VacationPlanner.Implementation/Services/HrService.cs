@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using VacationPlanner.Common.Events;
+using VacationPlanner.Core.Events;
 using VacationPlanner.Interfaces.Repository;
 using VacationPlanner.Interfaces.Services;
 using VacationPlanner.Models.DbModels;
@@ -11,18 +13,27 @@ namespace VacationPlanner.Implementation.Services
         private readonly IVacationRequestRepository _requestRepository;
         private readonly IVacationApprovalRepository _approvalRepository;
         private readonly IVacationRepository _vacationRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IDepartmentRepository _departmentRepository;
         private readonly ILogger<HrService> _logger;
+        private readonly IEventDispatcher _eventDispatcher;
 
         public HrService(
             IVacationRequestRepository requestRepository,
             IVacationApprovalRepository approvalRepository,
             IVacationRepository vacationRepository,
-            ILogger<HrService> logger)
+            IUserRepository userRepository,
+            IDepartmentRepository departmentRepository,
+            ILogger<HrService> logger,
+            IEventDispatcher eventDispatcher)
         {
             _requestRepository = requestRepository;
             _approvalRepository = approvalRepository;
             _vacationRepository = vacationRepository;
+            _userRepository = userRepository;
+            _departmentRepository = departmentRepository;
             _logger = logger;
+            _eventDispatcher = eventDispatcher;
         }
 
         public async Task<IEnumerable<HrVacationRequestDto>> GetAllRequestsAsync()
@@ -91,6 +102,13 @@ namespace VacationPlanner.Implementation.Services
 
             await _requestRepository.SaveChangesAsync();
 
+            await _eventDispatcher.PublishAsync(
+                new VacationRequestApprovedByHrEvent(
+                    request.UserId,
+                    requestId,
+                    request.User.Email,
+                    hrUserId.ToString()));
+
             _logger.LogInformation($"End approve request: {requestId}");
             return MapToHrDto(request);
         }
@@ -128,6 +146,12 @@ namespace VacationPlanner.Implementation.Services
             await _approvalRepository.AddAsync(approval);
 
             await _requestRepository.SaveChangesAsync();
+            var managerId = await _departmentRepository.GetManagerIdByDepartmentIdAsync(request.User.DepartmentId.Value);
+            await _eventDispatcher.PublishAsync(
+                new VacationRequestRejectedByManagerEvent(
+                    requestId,
+                    request.User.Email,
+                    managerId.ToString()));
 
             _logger.LogInformation($"End return for revision request: {requestId}");
             return MapToHrDto(request);

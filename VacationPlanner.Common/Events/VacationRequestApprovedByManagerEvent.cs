@@ -13,18 +13,14 @@ namespace VacationPlanner.Common.Events
 
         public string ManagerId { get; }
 
-        public string HrId { get; }
-
         public VacationRequestApprovedByManagerEvent(
             Guid vacationRequestId,
             string employeeMail,
-            string managerId,
-            string hrId)
+            string managerId)
         {
             VacationRequestId = vacationRequestId;
             EmployeeMail = employeeMail;
             ManagerId = managerId;
-            HrId = hrId;
         }
     }
 }
