@@ -38,10 +38,6 @@ namespace VacationPlanner.Implementation.EventHandlers.Notifications
     domainEvent.OldDepartmentName,
     domainEvent.NewPositionName,
     domainEvent.NewDepartmentName)
-               : string.Format(
-    Messages.ChangeDepartmentMessage,
-    domainEvent.OldDepartmentName,
-    domainEvent.NewDepartmentName)
             };
 
             await _notificationService.SendAsync(message);

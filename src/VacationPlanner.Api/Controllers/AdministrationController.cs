@@ -117,9 +117,6 @@ namespace VacationPlanner.Api.Controllers
         public async Task<IActionResult> ChangeUserDepartment(Guid userId, [FromBody] ChangeUserDepartmentRequest request)
         {
             var response = await _userRoleService.ChangeUserDepartmentAsync(userId, request.DepartmentId, request.PositionId);
-        public async Task<IActionResult> ChangeUserDepartment(Guid userId, [FromBody] int departmentId)
-        {
-            var response = await _userRoleService.ChangeUserDepartmentAsync(userId, departmentId);
             if (!response.Success)
                 return BadRequest(response.Message);
             return Ok();

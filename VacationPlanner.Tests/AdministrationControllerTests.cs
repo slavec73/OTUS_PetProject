@@ -446,7 +446,7 @@ namespace VacationPlanner.Tests
 
             _userRoleServiceMock
                 .Setup(x => x.ChangeUserRoleAsync(userId, roleId))
-                .ReturnsAsync(true);
+                .ReturnsAsync(new Models.Responses.ChangeUserPropertiesResponse { Success = true });
 
             // Act
             var result = await _controller.ChangeUserRole(userId, roleId);

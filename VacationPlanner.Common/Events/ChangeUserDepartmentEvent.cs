@@ -18,10 +18,6 @@
             string newDepartmentName,
             string oldPositionName,
             string newPositionName)
-        public ChangeUserDepartmentEvent(
-            string employeeMail,
-            string oldDepartmentName,
-            string newDepartmentName)
         {
             EmployeeMail = employeeMail;
             OldDepartmentName = oldDepartmentName;
